@@ -268,8 +268,8 @@
       border: 0;
       padding: 8px;
       cursor: pointer;
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       position: relative;
     }
 
@@ -939,7 +939,7 @@
     .field textarea {
       width: 100%;
       background: rgba(11,23,36,0.4);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(196,153,58,0.7);
       border-radius: 2px;
       padding: 14px 16px;
       color: var(--cream);
@@ -951,7 +951,8 @@
     .field input:focus,
     .field select:focus,
     .field textarea:focus {
-      outline: none;
+      outline: 2px solid var(--gold);
+      outline-offset: 0;
       border-color: var(--gold);
       background: rgba(11,23,36,0.6);
     }
@@ -1090,6 +1091,49 @@
 
     .footer-credit a:hover { color: var(--gold); }
 
+    /* Skip link */
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 8px;
+      z-index: 10000;
+      background: var(--gold);
+      color: var(--navy);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 12px 20px;
+      border-radius: 2px;
+      text-decoration: none;
+    }
+    .skip-link:focus {
+      left: 8px;
+      outline: 2px solid var(--navy);
+      outline-offset: 2px;
+    }
+
+    /* Global focus styles */
+    :focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 3px;
+      border-radius: 2px;
+    }
+
+    /* Inline field errors */
+    .field-error {
+      display: block;
+      font-size: 14px;
+      color: #e87070;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    .field input[aria-invalid="true"],
+    .field select[aria-invalid="true"],
+    .field textarea[aria-invalid="true"] {
+      border-color: #e87070;
+    }
+
     /* RESPONSIVE */
     @media (max-width: 900px) {
       .reality-grid,
@@ -1127,6 +1171,19 @@
       .form-row { grid-template-columns: 1fr; }
       .footer-inner { gap: 20px; }
       .footer-links { flex-wrap: wrap; gap: 20px; }
+
+      /* Minimum 14px font sizes on mobile */
+      .tag { font-size: 14px; }
+      .hero-eyebrow .label { font-size: 14px; }
+      .btn { font-size: 14px; }
+      .btn-sm { font-size: 14px; }
+      .mobile-panel a { font-size: 14px; }
+      .text-link { font-size: 14px; }
+      .outcome-panel .label { font-size: 14px; }
+      .contact-item .label { font-size: 14px; }
+      .footer-copy { font-size: 14px; }
+      .footer-credit { font-size: 14px; }
+      .footer-links a { font-size: 14px; }
 
       .nav-links, .nav-cta-wrap .btn { display: none; }
       .menu-button { display: block; }
@@ -1180,6 +1237,8 @@
 </head>
 <body>
 
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
   <!-- Noise overlay -->
   <svg class="noise" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <filter id="noise-filter">
@@ -1223,6 +1282,8 @@
       </div>
     </div>
   </nav>
+
+  <main id="main-content">
 
   <!-- HERO -->
   <section id="hero">
@@ -1548,16 +1609,18 @@
               <div class="form-row">
                 <div class="field">
                   <label for="name">Full Name</label>
-                  <input type="text" id="name" name="name" required autocomplete="name" />
+                  <input type="text" id="name" name="name" required autocomplete="name" aria-describedby="name-error" />
+                  <span class="field-error" id="name-error"></span>
                 </div>
                 <div class="field">
                   <label for="email">Email Address</label>
-                  <input type="email" id="email" name="email" required autocomplete="email" />
+                  <input type="email" id="email" name="email" required autocomplete="email" aria-describedby="email-error" />
+                  <span class="field-error" id="email-error"></span>
                 </div>
               </div>
 
               <div class="field">
-                <label for="enquiry_type">Enquiry Type <span style="color: var(--muted); text-transform: none; letter-spacing: 0; font-size: 10px;">(optional)</span></label>
+                <label for="enquiry_type">Enquiry Type <span style="color: var(--muted); text-transform: none; letter-spacing: 0; font-size: 13px;">(optional)</span></label>
                 <select id="enquiry_type" name="enquiry_type">
                   <option value="">Select one</option>
                   <option>AI Readiness Assessment</option>
@@ -1578,7 +1641,7 @@
               <p class="timeline-note">We respond to all enquiries within 24 hours.</p>
             </form>
 
-            <div class="form-success" id="form-success">
+            <div class="form-success" id="form-success" role="status" aria-live="polite" aria-atomic="true">
               <span class="check-mark" aria-hidden="true">✓</span>
               <p>Thank you. We will be in touch within 24 hours.</p>
             </div>
@@ -1602,6 +1665,8 @@
       </div>
     </div>
   </section>
+
+  </main><!-- /#main-content -->
 
   <!-- FOOTER -->
   <footer>
@@ -1668,11 +1733,56 @@
       }
     });
 
+    // Escape key closes mobile menu
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && nav.classList.contains('menu-open')) {
+        nav.classList.remove('menu-open');
+        menuButton.setAttribute('aria-expanded', 'false');
+        menuButton.focus();
+      }
+    });
+
     // Contact form (Web3Forms async)
     const contactForm = document.getElementById('contact-form');
     if (contactForm) {
+      const nameInput = document.getElementById('name');
+      const emailInput = document.getElementById('email');
+      const nameError = document.getElementById('name-error');
+      const emailError = document.getElementById('email-error');
+
+      function validateField(input, errorEl, emptyMsg) {
+        const val = input.value.trim();
+        if (!val) {
+          errorEl.textContent = emptyMsg;
+          input.setAttribute('aria-invalid', 'true');
+          return false;
+        }
+        if (input.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+          errorEl.textContent = 'Please enter a valid email address.';
+          input.setAttribute('aria-invalid', 'true');
+          return false;
+        }
+        errorEl.textContent = '';
+        input.removeAttribute('aria-invalid');
+        return true;
+      }
+
+      [nameInput, emailInput].forEach(function(input) {
+        input.addEventListener('input', function() {
+          var errorEl = input.id === 'name' ? nameError : emailError;
+          errorEl.textContent = '';
+          input.removeAttribute('aria-invalid');
+        });
+      });
+
       contactForm.addEventListener('submit', async function(e) {
         e.preventDefault();
+        const nameValid = validateField(nameInput, nameError, 'Please enter your full name.');
+        const emailValid = validateField(emailInput, emailError, 'Please enter your email address.');
+        if (!nameValid || !emailValid) {
+          (!nameValid ? nameInput : emailInput).focus();
+          return;
+        }
         const btn = document.getElementById('submit-btn');
         const originalHTML = btn.innerHTML;
         btn.innerHTML = 'Sending...';
