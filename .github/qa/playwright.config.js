@@ -1,16 +1,18 @@
 // Studio26 QA — Playwright Configuration
+const path = require('path');
+const projectRoot = path.resolve(__dirname, '../..');
 
 const { defineConfig } = require('@playwright/test');
 
 module.exports = defineConfig({
-  testDir: '.github/qa',
+  testDir: __dirname,
   testMatch: 'qa.spec.js',
   timeout: 30_000,
   retries: 0,
 
   reporter: [
     ['list'],
-    ['html', { outputFolder: 'playwright-report', open: 'on-failure' }],
+    ['html', { outputFolder: path.join(projectRoot, 'playwright-report'), open: 'on-failure' }],
   ],
 
   use: {
@@ -27,5 +29,5 @@ module.exports = defineConfig({
     },
   ],
 
-  outputDir: 'qa-screenshots',
+  outputDir: path.join(projectRoot, 'qa-screenshots'),
 });
