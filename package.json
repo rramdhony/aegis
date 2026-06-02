@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "qa": "start-server-and-test \"serve . -l 3000\" http://localhost:3000 \"playwright test --config .github/qa/playwright.config.js\"",
+    "qa:headed": "start-server-and-test \"serve . -l 3000\" http://localhost:3000 \"playwright test --config .github/qa/playwright.config.js --headed\"",
     "qa:report": "playwright show-report playwright-report",
     "qa:html": "html-validate --config .github/qa/.htmlvalidate.json index.html",
     "postinstall": "playwright install chromium"
